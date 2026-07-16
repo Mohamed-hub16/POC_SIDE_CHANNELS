@@ -10,7 +10,7 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Deserialize)]
 struct Parameters {
-    code : Option<String>,
+    user_secret : Option<String>,
 }
 
 
@@ -32,7 +32,7 @@ async fn seiko_home_page() ->  &'static str{
 async fn seiko_secret_page(Query(p) : Query<Parameters>) -> String{
     let secret =  "KstUvamdoiekldz";
     
-    match p.code{
+    match p.user_secret{
         Some(c)=>{
             if compare(secret, &c).await {
                 "VOUS AVEZ REUSSI".to_string()
@@ -46,12 +46,12 @@ async fn seiko_secret_page(Query(p) : Query<Parameters>) -> String{
         
 }
 
-async fn compare(secret : &str, code : &str) -> bool{
+async fn compare(secret : &str, user_secret : &str) -> bool{
     let secret = secret.as_bytes();
-    let code = code.as_bytes();
+    let user_secret = user_secret.as_bytes();
 
 
-    if secret.len() != code.len(){
+    if secret.len() != user_secret.len(){
         return false
     }
 
@@ -60,7 +60,7 @@ async fn compare(secret : &str, code : &str) -> bool{
 
     let mut i = 0;
     while i < secret.len() {
-        if secret[i] != code[i] {
+        if secret[i] != user_secret[i] {
             break;
         }
 

@@ -16,17 +16,19 @@ async fn main(){
     
 }
 
+
+
 async fn get_the_length_of_secret() -> usize{
 
     let mut guess_characters = "a".to_string();
     let mut times_of_response: Vec<(usize, Duration)> = Vec::new();
     for i in 1..31{
-        let url = format!("http://localhost:3000/seiko_secret?code={}", guess_characters);
+        let url = format!("http://localhost:3000/seiko_secret?user_secret={}", guess_characters);
         let start = Instant::now();
         let _request = reqwest::get(&url).await;
         let end = start.elapsed();
 
-        println!("{:?}",end);
+        println!("Indice {} -> {:?}",i,end);
         times_of_response.push((i,end));
         guess_characters+="a";
 
@@ -34,14 +36,12 @@ async fn get_the_length_of_secret() -> usize{
 
     return find_the_length(times_of_response)
 
-
-
-}
+}               
 
 fn find_the_length(times_of_response  : Vec<(usize, Duration)>) -> usize{
 
     let mut indice_max = 0;
-    let mut time_max = Duration::from_millis(1);
+    let mut time_max = Duration::ZERO;
 
     for (i,t) in times_of_response.iter(){
         if *t > time_max {
@@ -51,8 +51,6 @@ fn find_the_length(times_of_response  : Vec<(usize, Duration)>) -> usize{
     }
 
     return indice_max;
-
-
 }
 
 
@@ -67,17 +65,15 @@ async fn get_the_secret(length_of_secret : usize) -> String{
 
         for c in characters.chars(){
             let guess_characters = secret.clone() + &c.to_string() + &"a".repeat(length_of_secret - i - 1);
-            let url = format!("http://localhost:3000/seiko_secret?code={}", guess_characters);
+            let url = format!("http://localhost:3000/seiko_secret?user_secret={}", guess_characters);
             let start = Instant::now();
             let _request = reqwest::get(&url).await;
             let end = start.elapsed();
 
             times_of_response.push((c.to_string(),end));
         }
-
-
         let mut bestCaracter = "";
-        let mut time_max = Duration::from_millis(1);
+        let mut time_max = Duration::ZERO;
 
         for (c,t) in times_of_response.iter(){
             if *t > time_max {
@@ -89,9 +85,6 @@ async fn get_the_secret(length_of_secret : usize) -> String{
         println!("Meilleur c : {}", bestCaracter);
 
         secret+=bestCaracter;
-
     }
-
     return secret;
-
 }
